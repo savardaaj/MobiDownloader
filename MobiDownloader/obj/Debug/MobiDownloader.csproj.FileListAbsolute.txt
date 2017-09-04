@@ -1,0 +1,14 @@
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\MobiDownloader.exe.config
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\MobiDownloader.exe
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\MobiDownloader.pdb
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\HtmlAgilityPack.dll
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\log4net.dll
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\HtmlAgilityPack.pdb
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\HtmlAgilityPack.xml
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\log4net.xml
+C:\Dev\RDP\MobiDownloader\MobiDownloader\obj\Debug\MobiDownloader.Form1.resources
+C:\Dev\RDP\MobiDownloader\MobiDownloader\obj\Debug\MobiDownloader.Properties.Resources.resources
+C:\Dev\RDP\MobiDownloader\MobiDownloader\obj\Debug\MobiDownloader.csproj.GenerateResource.Cache
+C:\Dev\RDP\MobiDownloader\MobiDownloader\obj\Debug\MobiDownloader.exe
+C:\Dev\RDP\MobiDownloader\MobiDownloader\obj\Debug\MobiDownloader.pdb
+C:\Dev\RDP\MobiDownloader\MobiDownloader\obj\Debug\MobiDownloader.csprojResolveAssemblyReference.cache
