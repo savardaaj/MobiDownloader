@@ -1,6 +1,5 @@
-C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\MobiDownloader.exe.config
 C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\MobiDownloader.exe
-C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\MobiDownloader.pdb
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\MobiDownloader.exe.config
 C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\HtmlAgilityPack.dll
 C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\log4net.dll
 C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\HtmlAgilityPack.pdb
@@ -12,3 +11,8 @@ C:\Dev\RDP\MobiDownloader\MobiDownloader\obj\Debug\MobiDownloader.csproj.Generat
 C:\Dev\RDP\MobiDownloader\MobiDownloader\obj\Debug\MobiDownloader.exe
 C:\Dev\RDP\MobiDownloader\MobiDownloader\obj\Debug\MobiDownloader.pdb
 C:\Dev\RDP\MobiDownloader\MobiDownloader\obj\Debug\MobiDownloader.csprojResolveAssemblyReference.cache
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\MobiDownloader.pdb
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\Goodreads.dll
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\RestSharp.dll
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\Goodreads.pdb
+C:\Dev\RDP\MobiDownloader\MobiDownloader\bin\Debug\RestSharp.xml
