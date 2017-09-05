@@ -21,11 +21,14 @@ namespace MobiDownloader
     {
         private static readonly log4net.ILog log
             = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        
+
+        Match match;
+
         HtmlAgilityPack.HtmlDocument htmlDoc;
         NetworkCredential credentials;
         OpenFileDialog fileDialog;
         WebClient wc;
+        WebClient webc;
         HttpWebRequest request;
         MailMessage mail;
         SmtpClient client;
@@ -82,89 +85,79 @@ namespace MobiDownloader
             try
             {
                 Initialize();
+                listBoxLog.Items.Add("Creating web request");
+                request = (HttpWebRequest)HttpWebRequest.Create(websiteURI);
+                request.UserAgent = "A .NET Web Crawler";
 
-                try
+                //Get the HTML text / Load it into parser
+
+                using (response = request.GetResponse())
                 {
-                    listBoxLog.Items.Add("Creating web request");
-                    request = (HttpWebRequest)HttpWebRequest.Create(websiteURI);
-                    request.UserAgent = "A .NET Web Crawler";
+                    stream = response.GetResponseStream();
+                    Stream streamCopy = new MemoryStream();
+                    stream.CopyTo(streamCopy);
 
-                    //Get the HTML text / Load it into parser
+                    reader = new StreamReader(streamCopy);
+                    streamCopy.Position = 0;
+                    readerCopy = new StreamReader(streamCopy);
+                    listBoxLog.Items.Add("Reading response");
 
-                    using (response = request.GetResponse())
+                    using (reader)
                     {
-                        stream = response.GetResponseStream();
-                        Stream streamCopy = new MemoryStream();
-                        stream.CopyTo(streamCopy);
-
-                        reader = new StreamReader(streamCopy);
-                        streamCopy.Position = 0;
-                        readerCopy = new StreamReader(streamCopy);
-                        listBoxLog.Items.Add("Reading response");
-
-                        using (reader)
+                        //Check for mobi first
+                        while (!found)
                         {
-                            //Check for mobi first
-                            while (!found)
+                            desiredString = reader.ReadLine();
+                            if (!(desiredString == null))
                             {
-                                desiredString = reader.ReadLine();
-                                if (!(desiredString == null))
+                                if(desiredString.Contains("<td nowrap>English"))
                                 {
-                                    if(desiredString.Contains("English</td>"))
+                                    desiredString = reader.ReadLine();
+                                    desiredString = reader.ReadLine();
+                                    if (desiredString.Contains("mobi</td>"))
                                     {
-                                        desiredString = reader.ReadLine();
-                                        desiredString = reader.ReadLine();
-                                        if (desiredString.Contains("mobi</td>"))
-                                        {
-                                            desiredString = reader.ReadLine(); //line with link I want            
-                                            found = true;
-                                            fileType = ".mobi";
-                                            listBoxLog.Items.Add(".mobi found");
-                                        }
+                                        desiredString = reader.ReadLine(); //line with link I want            
+                                        found = true;
+                                        fileType = ".mobi";
+                                        listBoxLog.Items.Add(".mobi found");
                                     }
-                                }
-                                else
-                                {
-                                    listBoxLog.Items.Add(".mobi not found");
-                                    break;
                                 }
                             }
-
-                            streamCopy.Position = 0;
-                            readerCopy = new StreamReader(streamCopy);
-
-                            while (!found)
+                            else
                             {
-                                desiredString = readerCopy.ReadLine();
-                                if (!(desiredString == null))
+                                listBoxLog.Items.Add(".mobi not found");
+                                break;
+                            }
+                        }
+
+                        streamCopy.Position = 0;
+                        readerCopy = new StreamReader(streamCopy);
+
+                        while (!found)
+                        {
+                            desiredString = readerCopy.ReadLine();
+                            if (!(desiredString == null))
+                            {
+                                if (desiredString.Contains("<td nowrap>English"))
                                 {
-                                    if (desiredString.Contains("English</td>"))
+                                    desiredString = readerCopy.ReadLine();
+                                    desiredString = readerCopy.ReadLine();
+                                    if (desiredString.Contains("pdf</td>"))
                                     {
                                         desiredString = readerCopy.ReadLine();
-                                        desiredString = readerCopy.ReadLine();
-                                        if (desiredString.Contains("pdf</td>"))
-                                        {
-                                            desiredString = readerCopy.ReadLine();
-                                            found = true;
-                                            fileType = ".pdf";
-                                            listBoxLog.Items.Add(".pdf found");
-                                            coverImage = GetCoverImage(fileName);
-                                        }
+                                        found = true;
+                                        fileType = ".pdf";
+                                        listBoxLog.Items.Add(".pdf found");
                                     }
                                 }
-                                else
-                                {
-                                    listBoxLog.Items.Add(".pdf not found");
-                                    break;
-                                }
+                            }
+                            else
+                            {
+                                listBoxLog.Items.Add(".pdf not found");
+                                break;
                             }
                         }
                     }
-                }
-                catch (Exception es)
-                {
-                    log.Info(es.ToString());
-                    listBoxLog.Items.Add(es.ToString());
                 }
 
                 labelProgress.Text = "Downloading " + fileType;
@@ -307,7 +300,14 @@ namespace MobiDownloader
                 string oldFile = fileName;
                 Process converter = new Process();
                 converter.StartInfo.FileName = (@"C:\Program Files\Calibre2\ebook-convert.exe");
-                converter.StartInfo.Arguments = "\"" + oldFile + "\"" + " \"" + newFile + "\"" + " --cover " + "\"" + textBoxDownloadLoc.Text + coverImage + "\"";
+                if (coverImage == "")
+                {
+                    converter.StartInfo.Arguments = "\"" + oldFile + "\"" + " \"" + newFile + "\"";
+                }
+                else
+                {
+                    converter.StartInfo.Arguments = "\"" + oldFile + "\"" + " \"" + newFile + "\"" + " --cover " + "\"" + coverImage + "\"";
+                }
                 //converter.StartInfo.CreateNoWindow = true;
                 converter.Start();
                 return newFile;
@@ -337,6 +337,7 @@ namespace MobiDownloader
                     mail.Body = "Doesn't matter";
                     if (!(attachment.Split('.')[1].Equals("mobi"))) //If the attchment file is not a mobi, convert it
                     {
+                        string coverImage = attachment.Split('.')[0] + ".png";
                         attachment = ConvertToMobi(attachment, coverImage);
                         if (!File.Exists(attachment))
                         {
@@ -390,19 +391,6 @@ namespace MobiDownloader
             }
         }
 
-        private void buttonCancelDownload_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                client.SendAsyncCancel();
-                client.Dispose();
-            }
-            catch (Exception ex)
-            {
-                log.Info(ex.ToString());
-            }
-        }
-
         private void tb_ToEmail(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -425,86 +413,71 @@ namespace MobiDownloader
             //Search Result URL: /book/show/77566.Hyperion
 
             string coverImage = "";
+            string uri = "https://www.goodreads.com/search?q=";
 
-            ProcessWebRequest(fileName);
+            //Set params for first href request
+            string bookTitle = fileName.Split(' ')[0];
+            Regex reg = new Regex(@"(\/book\/show\/[0-9]*." + bookTitle + "?)");
+            string attrString = "//a[@href]";
+            string attrType = "href";
+            string pageLink = CallRequestProcessResponse(new Uri(uri), fileName, reg, attrString, attrType, false);
 
+            //Reset params for new request for src
+            uri = "https://www.goodreads.com" + pageLink;
+            reg = new Regex("(<div class=\"editionCover\")");
+            attrString = "//img/@src";
+            attrType = "src";
 
+            pageLink = CallRequestProcessResponse(new Uri(uri), "", reg, attrString, attrType, true);
+
+            if(pageLink != "") {
+                webc = new WebClient();
+                coverImage = textBoxDownloadLoc.Text + fileName + ".png";
+                webc.DownloadFile(new Uri(pageLink), coverImage);
+            }
             return coverImage;
         }
 
-        private void ProcessWebRequest(string fileName)
+        private string CallRequestProcessResponse(Uri uri, string fileName, Regex reg, string attrString, string attrType, bool readTwice)
         {
-
-            websiteURI = new Uri("https://www.goodreads.com/search?q=" + fileName); //declare page to search
-            request = (HttpWebRequest)HttpWebRequest.Create(websiteURI);
-            using (response = request.GetResponse())
+            htmlDoc = new HtmlAgilityPack.HtmlDocument();
+            try
             {
-                stream = response.GetResponseStream();
-                Stream streamCopy = new MemoryStream();
-                stream.CopyTo(streamCopy);
+                websiteURI = new Uri(uri + fileName.Replace(' ', '+')); //declare page to search
+                request = (HttpWebRequest)HttpWebRequest.Create(websiteURI);
 
-                reader = new StreamReader(streamCopy);
-                streamCopy.Position = 0;
-                readerCopy = new StreamReader(streamCopy);
-
-                string bookTitle = fileName.Split(' ')[0];
-                Regex reg = new Regex(@"(\/book\/show\/[0-9]*." + bookTitle + "?)");
-                Match match;
-
-                using (reader)
+                using (response = request.GetResponse())
                 {
-                    //Check for  first
-                    found = false;
-                    while (!found)
+                    stream = response.GetResponseStream();
+                    reader = new StreamReader(stream);
+
+                    using (reader)
                     {
-                        desiredString = reader.ReadLine();
-                        match = reg.Match(desiredString);
-                        if (match.Success)
-                        {
-                            htmlDoc.LoadHtml(desiredString);
-                            dlPageLink = ExtractFromHtml(htmlDoc, "//a[@href]", "href");
-                            found = true;
-                        }
-                    }
-                }
-            }
-
-            if (!dlPageLink.Equals(""))
-            {
-                try
-                {
-                    request = (HttpWebRequest)HttpWebRequest.Create("https://www.goodreads.com" + dlPageLink);
-                    request.UserAgent = "A .NET Web Crawler";
-
-                    //Get the HTML text / Load it into parser
-
-                    using (response = request.GetResponse())
-                    {
-                        stream = response.GetResponseStream();
-                        reader = new StreamReader(stream);
-
+                        //Check for  first
                         found = false;
                         while (!found)
                         {
                             desiredString = reader.ReadLine();
-                            if (desiredString.Contains("<div class=\"editionCover\""))
+                            match = reg.Match(desiredString);
+                            if (match.Success)
                             {
-                                desiredString = reader.ReadLine();
+                                if(readTwice)
+                                {
+                                    desiredString = reader.ReadLine();
+                                }
                                 htmlDoc.LoadHtml(desiredString);
-                                dlPageLink = ExtractFromHtml(htmlDoc, "//img/@src", "src");
-
+                                dlPageLink = ExtractFromHtml(htmlDoc, attrString, attrType);
                                 found = true;
-                                wc = new WebClient();
-                                wc.DownloadFileAsync(new Uri(dlPageLink), textBoxDownloadLoc.Text + fileName + ".png");
                             }
                         }
                     }
                 }
-                catch(Exception ex)
-                {
-                    log.Info(ex);
-                }
             }
+            catch (Exception ex)
+            {
+                log.Info(ex);
+            }
+            return dlPageLink;
         }
 
         private string ExtractFromHtml(HtmlAgilityPack.HtmlDocument htmlSnippet, string attribute, string attr)
@@ -524,6 +497,25 @@ namespace MobiDownloader
             }
 
             return "";
+        }
+
+        private void buttonCancelDownload_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                client.SendAsyncCancel();
+                client.Dispose();
+            }
+            catch (Exception ex)
+            {
+                log.Info(ex.ToString());
+            }
+        }
+
+        private void buttonDownloadCover_Click(object sender, EventArgs e)
+        {
+            fileName = textBoxFileName.Text;
+            GetCoverImage(fileName);
         }
     }
 }

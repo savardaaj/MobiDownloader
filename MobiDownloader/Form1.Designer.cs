@@ -44,6 +44,7 @@
             this.buttonEmailBulk = new System.Windows.Forms.Button();
             this.labelFileName = new System.Windows.Forms.Label();
             this.buttonCancelDownload = new System.Windows.Forms.Button();
+            this.buttonDownloadCover = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonDownload
@@ -187,11 +188,22 @@
             this.buttonCancelDownload.UseVisualStyleBackColor = true;
             this.buttonCancelDownload.Click += new System.EventHandler(this.buttonCancelDownload_Click);
             // 
+            // buttonDownloadCover
+            // 
+            this.buttonDownloadCover.Location = new System.Drawing.Point(323, 149);
+            this.buttonDownloadCover.Name = "buttonDownloadCover";
+            this.buttonDownloadCover.Size = new System.Drawing.Size(98, 23);
+            this.buttonDownloadCover.TabIndex = 18;
+            this.buttonDownloadCover.Text = "Download Cover";
+            this.buttonDownloadCover.UseVisualStyleBackColor = true;
+            this.buttonDownloadCover.Click += new System.EventHandler(this.buttonDownloadCover_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(686, 333);
+            this.Controls.Add(this.buttonDownloadCover);
             this.Controls.Add(this.buttonCancelDownload);
             this.Controls.Add(this.labelFileName);
             this.Controls.Add(this.buttonEmailBulk);
@@ -233,6 +245,7 @@
         private System.Windows.Forms.Button buttonEmailBulk;
         private System.Windows.Forms.Label labelFileName;
         private System.Windows.Forms.Button buttonCancelDownload;
+        private System.Windows.Forms.Button buttonDownloadCover;
     }
 }
 
